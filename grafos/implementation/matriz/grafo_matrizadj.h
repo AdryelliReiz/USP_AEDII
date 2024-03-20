@@ -10,3 +10,4 @@ typedef struct {
     int numVertices;
     int numArestas;
 } Grafo;
+typedef int Apontador;
