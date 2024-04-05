@@ -12,7 +12,7 @@ int main() {
         scanf("%d", &numVertices);
     } while (!inicializaGrafo(&g1, numVertices));
 
-    //imrimeGrafo(&g1);
+    //imprimeGrafo(&g1);
 
     return 0;
 }
