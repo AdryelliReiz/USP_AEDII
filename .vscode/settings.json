@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "grafo_matrizadj.h": "c"
+        "grafo_matrizadj.h": "c",
+        "grafo_listaadj.h": "c"
     }
 }

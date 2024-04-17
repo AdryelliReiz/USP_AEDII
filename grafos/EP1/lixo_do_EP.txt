@@ -1,0 +1,278 @@
+#include <stdio.h>
+#include "grafo_matrizadj.h"
+
+void inicializaGrafo(Grafo *grafo, int numVertices) {
+    grafo->numVertices = numVertices;
+    grafo->numArestas = 0;
+    for (int i = 0; i < numVertices; i++) {
+        for (int j = 0; j < numVertices; j++) {
+            grafo->mat[i][j] = AN;
+        }
+    }
+}
+
+void insereAresta(Grafo *grafo, int v1, int v2, Peso peso) {
+    if (grafo->mat[v1][v2] == AN) {
+        grafo->mat[v1][v2] = peso;
+        grafo->mat[v2][v1] = peso;
+        grafo->numArestas++;
+    }
+}
+
+void imprimeGrafo(Grafo *grafo) {
+    printf("    ");
+    for(int i = 0; i < grafo->numVertices; i++) {
+        printf("%d ", i);
+    }
+    printf("\n--|---------------\n");
+    for (int i = 0; i < grafo->numVertices; i++) {
+        printf("%d | ", i);
+        for (int j = 0; j < grafo->numVertices; j++) {
+            if (grafo->mat[i][j] != AN) {
+                printf("1 ");
+            } else {
+                printf("0 ");
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void buscaEmLargura(Grafo *grafo, int vertice) {
+    int visitados[grafo->numVertices];
+    int fila[grafo->numVertices];
+    int inicio = 0;
+    int fim = 0;
+    int nivel[grafo->numVertices];
+    int pai[grafo->numVertices];
+    int caminho[grafo->numVertices][grafo->numVertices];
+
+    for (int i = 0; i < grafo->numVertices; i++) {
+        visitados[i] = 0;
+        nivel[i] = -1;
+        pai[i] = -1;
+        for (int j = 0; j < grafo->numVertices; j++) {
+            caminho[i][j] = -1;
+        }
+    }
+
+    visitados[vertice] = 1;
+    nivel[vertice] = 0;
+    pai[vertice] = -1;
+    fila[fim++] = vertice;
+
+    while (inicio != fim) {
+        int v = fila[inicio++];
+        for (int i = 0; i < grafo->numVertices; i++) {
+            if (grafo->mat[v][i] != AN && !visitados[i]) {
+                visitados[i] = 1;
+                nivel[i] = nivel[v] + 1;
+                pai[i] = v;
+                fila[fim++] = i;
+            }
+        }
+
+        //se a fila estiver vazia, insere o proximo vertice nao visitado
+        if(inicio == fim){
+            for(int i = 0; i < grafo->numVertices; i++){
+                if(!visitados[i]){
+                    visitados[i] = 1;
+                    nivel[i] = 0;
+                    pai[i] = v;
+                    fila[fim++] = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    printf("BL:\n");
+    for (int i = 0; i < grafo->numVertices; i++) {
+        printf("%d ", fila[i]);
+    }
+    
+    //monta os caminhos de cada vertice para o vertice inicial (pai)
+    for (int i = 0; i < grafo->numVertices; i++) {
+        int v = i;
+        while (v != -1) {
+            caminho[i][nivel[v]] = v;
+            v = pai[v];
+        }
+    }
+
+    printf("\n");
+    printf("Caminhos BL:\n");
+    //imprime caminhos
+    for (int i = 0; i < grafo->numVertices; i++) {
+        for (int j = 0; j < grafo->numVertices; j++) {
+            if (caminho[i][j] != -1) {
+                printf("%d ", caminho[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+void buscaEmProfundidade(Grafo * grafo, int vertice) {
+    int visitados[grafo->numVertices];
+    int fila[grafo->numVertices];
+    int indexFila = 0, fim = 0;
+    int nivel[grafo->numVertices];
+    int pai[grafo->numVertices];
+    int caminho[grafo->numVertices][grafo->numVertices];
+
+    for (int i = 0; i < grafo->numVertices; i++) {
+        visitados[i] = 0;
+        nivel[i] = -1;
+        pai[i] = -1;
+        for (int j = 0; j < grafo->numVertices; j++) {
+            caminho[i][j] = -1;
+        }
+    }
+
+    visitados[vertice] = 1;
+    nivel[vertice] = 0;
+    pai[vertice] = -1;
+    fila[fim++] = vertice;
+
+    while(indexFila != fim) {
+        //se não existir um vertice valido, pega o proximo vertice nao visitado
+        if(vertice == -1) {
+            for(int i = 0; i < grafo->numVertices; i++) {
+                if(!visitados[i]) {
+                    visitados[i] = 1;
+                    nivel[i] = 0;
+                    pai[i] = -1;
+                    indexFila = fim;
+                    fila[fim++] = i;
+                    vertice = i;
+                    break;
+                }
+            }
+
+        } else {
+            int v = fila[indexFila++];
+            for (int i = 0; i < grafo->numVertices; i++) {
+                //acha o primeiro vertice adjacente nao visitado
+                if(grafo->mat[vertice][i] != AN && !visitados[i]) {
+                    visitados[i] = 1;
+                    nivel[i] = nivel[vertice] + 1;
+                    pai[i] = vertice;
+                    fila[fim++] = i;
+                    //atualiza o vertice v e reinicia a busca
+                    vertice = i;
+                    break;
+                }
+            }
+
+            //se nao achou vertice adjacente nao visitado desse pai
+            //volta para o pai e percorre os vertices adjacentes
+            if(v == vertice) {
+                indexFila--;
+                vertice = pai[vertice];
+            }
+        }
+    }
+
+    printf("BP:\n");
+    for(int i = 0; i < grafo->numVertices; i++) {
+        printf("%d ", fila[i]);
+    }
+
+    //monta os caminhos de cada vertice para o vertice inicial (pai)
+    for (int i = 0; i < grafo->numVertices; i++) {
+        int v = i;
+        while (v != -1) {
+            caminho[i][nivel[v]] = v;
+            v = pai[v];
+        }
+    }
+
+    printf("\n");
+    printf("Caminhos BP:\n");
+    //imprime caminhos
+    for(int i = 0; i < grafo->numVertices; i++) {
+        for(int j = 0; j < grafo->numVertices; j++) {
+            if(caminho[i][j] != -1) {
+                printf("%d ", caminho[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+void componentesConexos(Grafo *grafo, int vertice) {
+    int visitados[grafo->numVertices];
+    int pai[grafo->numVertices];
+    int conexoes[grafo->numVertices][grafo->numVertices];
+    int componentes;
+    int vertices;
+    int verticesVisitados;
+
+    for (int i = 0; i < grafo->numVertices; i++) {
+        visitados[i] = 0;
+        pai[i] = -1;
+        for (int j = 0; j < grafo->numVertices; j++) {
+            conexoes[i][j] = -1;
+        }
+    }
+
+    visitados[vertice] = 1;
+    pai[vertice] = -1;
+    conexoes[0][0] = vertice;
+    componentes = 0;
+    vertices = 0;
+    verticesVisitados = 1;
+
+    //enquanto ainda existe vertices não visitados
+    while(verticesVisitados != grafo->numVertices) {
+        //verifica se o vertice é o primeiro vertice do componente
+        if(vertice == -1) {
+            for(int i = 0; i < grafo->numVertices; i++) {
+                if(!visitados[i]) {
+                    visitados[i] = 1;
+                    verticesVisitados++;
+                    pai[i] = -1;
+                    vertices = 0;
+                    conexoes[++componentes][vertices] = i;
+                    vertice = i;
+                    printf("Vertice encontrado: %d\n", vertice);
+                }
+            }
+        } else {
+            int v = vertice;
+            for(int i = 0; i < grafo->numVertices; i++) {
+                if(grafo->mat[vertice][i] && !visitados[i]) {
+                    visitados[i] = 1;
+                    verticesVisitados++;
+                    pai[i] = vertice;
+                    conexoes[componentes][++vertices] = i;
+                    vertice = i;
+                    printf("Vertice encontrado: %d\n", vertice);
+                }
+            }
+            
+            //verifica se não achou nenhum vertice adjacente
+            if(v == vertice) {
+                //volta a fazer a busca pelo vertice adjacente anterior
+                vertice = pai[vertice];
+            }
+        }
+    }
+    //Ordenar antes de imprimir
+
+    printf("Componentes Conectados:\n");
+    for(int i = 0; i < (componentes + 1); i++) {
+        printf("C%d: ", (i + 1));
+        int index = 0;
+        while(conexoes[i][index] != -1) {
+            printf("%d ", conexoes[i][index]);
+            index++;
+        }
+        printf("\n");
+    }
+}
+
+void verticesDeArticulacao(Grafo *grafo) {
+}
