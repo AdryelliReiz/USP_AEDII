@@ -35,7 +35,7 @@ bool verificaApontador(Apontador p, Grafo* grafo);
 void visitaEmLargura(int vertice, int visitados[], int nivel[], int antecessor[], int fila[], int *inicio, int *fim, Grafo *grafo) {
     int verticeAdj;
     Apontador apontadorVerticeAdj = primeiroListaAdj(vertice, grafo);
-    if(!verificaApontador(apontadorVerticeAdj, grafo)) verticeAdj = -1;
+    if(!verificaApontador(apontadorVerticeAdj, grafo)) verticeAdj = -1; //vertice invalido
     else verticeAdj = obtemValorVertice(apontadorVerticeAdj, grafo);
 
     while(verticeAdj != -1) {
@@ -56,13 +56,13 @@ void visitaEmLargura(int vertice, int visitados[], int nivel[], int antecessor[]
     visitados[vertice] = 2;
 
     //se tem elementos na fila, continuar com a visita
-    if(inicio != fim && (*fim) < obtemNrVertices(grafo)) {
+    if(*inicio < *fim && (*fim) < obtemNrVertices(grafo)) {
         (*inicio)++;
         visitaEmLargura(fila[*inicio], visitados, nivel, antecessor, fila, inicio, fim, grafo);
     }
 }
 
-void visitaEmProfundidade(int vertice, int visitados[], int nivel[], int antecessor[], int fila[], int *inicio, int *fim, Grafo *grafo) {
+void visitaEmProfundidade(int vertice, int visitados[], int nivel[], int antecessor[], int fila[], int *fim, Grafo *grafo) {
     int verticeAdj;
     Apontador apontadorVerticeAdj = primeiroListaAdj(vertice, grafo);
     if(!verificaApontador(apontadorVerticeAdj, grafo)) verticeAdj = -1;
@@ -75,7 +75,28 @@ void visitaEmProfundidade(int vertice, int visitados[], int nivel[], int anteces
             nivel[verticeAdj] = nivel[vertice] + 1;
             antecessor[verticeAdj] = vertice;
             fila[(*fim)++] = verticeAdj;
-            visitaEmProfundidade(verticeAdj, visitados, nivel, antecessor, fila, inicio, fim, grafo);
+            visitaEmProfundidade(verticeAdj, visitados, nivel, antecessor, fila, fim, grafo);
+            visitados[verticeAdj] = 2;
+        }
+        apontadorVerticeAdj = proxListaAdj(vertice, grafo, apontadorVerticeAdj);
+        if(!verificaApontador(apontadorVerticeAdj, grafo)) verticeAdj = -1;
+        else verticeAdj = obtemValorVertice(apontadorVerticeAdj, grafo);
+    }
+}
+
+void visitaEmProfundidadeComponentesConexos(int vertice, int visitados[], int antecessor[], int fila[], int *fim, Grafo *grafo) {
+    int verticeAdj;
+    Apontador apontadorVerticeAdj = primeiroListaAdj(vertice, grafo);
+    if(!verificaApontador(apontadorVerticeAdj, grafo)) verticeAdj = -1;
+    else verticeAdj = obtemValorVertice(apontadorVerticeAdj, grafo);
+    
+    // enquanto o vértice é válido, se não foi visitado-> visita, senão procura outro adjacente
+    while(verticeAdj != -1) {
+        if(!visitados[verticeAdj]) {
+            visitados[verticeAdj] = 1;
+            antecessor[verticeAdj] = vertice;
+            fila[(*fim)++] = verticeAdj;
+            visitaEmProfundidadeComponentesConexos(verticeAdj, visitados, antecessor, fila, fim, grafo);
             visitados[verticeAdj] = 2;
         }
         apontadorVerticeAdj = proxListaAdj(vertice, grafo, apontadorVerticeAdj);
@@ -100,7 +121,7 @@ void ordenarArray(int array[], int n) {
 //Funções principais que usam as funções acima '0'
 
 //tá funfando legal
-void buscaEmLargura(Grafo *grafo, int vertice) {
+void buscaEmLargura(Grafo *grafo) {
     int visitados[obtemNrVertices(grafo)];
     int fila[obtemNrVertices(grafo)];
     int inicio = 0;
@@ -118,27 +139,17 @@ void buscaEmLargura(Grafo *grafo, int vertice) {
         }
     }
 
-    visitados[vertice] = 1;
-    nivel[vertice] = 0;
-    antecessor[vertice] = -1;
-    fila[fim++] = vertice;
+    for(int i = 0; i < obtemNrVertices(grafo); i++) {
+        if(!visitados[i]) {
+            visitados[i] = 1;
+            nivel[i] = 0;
+            antecessor[i] = -1;
+            fila[fim++] = i;
+            
+            visitaEmLargura(i, visitados, nivel, antecessor, fila, &inicio, &fim, grafo);
 
-    visitaEmLargura(vertice, visitados, nivel, antecessor, fila, &inicio, &fim, grafo);
-
-    //verifica se chegou ao fim da busca e se ainda tem vertices para visitar
-    while(inicio == fim && (fim + 1) < obtemNrVertices(grafo)) {
-        //acha o vertice
-        for(int i = 0; i < obtemNrVertices(grafo); i++) {
-            if(!visitados[i]) {
-                visitados[i] = 1;
-                nivel[i] = 0;
-                antecessor[i] = -1;
-                fila[fim++] = i;
-                break;
-            }
+            visitados[i] = 2; //marca como preto pq acabou os vertices adjacentes
         }
-        //se achou, começa uma nova busca
-        if(inicio != fim) visitaEmLargura(fila[inicio++], visitados, nivel, antecessor, fila, &inicio, &fim, grafo);
     }
 
     printf("BL:\n");
@@ -168,13 +179,13 @@ void buscaEmLargura(Grafo *grafo, int vertice) {
     }
 }
 
-void buscaEmProfundidade(Grafo *grafo, int vertice) {
+void buscaEmProfundidade(Grafo *grafo) {
     int antecessor[obtemNrVertices(grafo)];
     int caminho[obtemNrVertices(grafo)][obtemNrVertices(grafo)];
     int nivel[obtemNrVertices(grafo)];
     int visitados[obtemNrVertices(grafo)];
     int fila[obtemNrVertices(grafo)];
-    int inicio = 0, fim = 0;
+    int fim = 0;
 
     //formatar tudo certinho
     for (int i = 0; i < grafo->numVertices; i++) {
@@ -186,27 +197,16 @@ void buscaEmProfundidade(Grafo *grafo, int vertice) {
         }
     }
 
-    //começa a visita
-    visitados[vertice] = 1;
-    nivel[vertice] = 0;
-    antecessor[vertice] = -1;
-    fila[fim++] = vertice;
+    //para cada vertice não visitado, visita
+    for(int i = 0; i < obtemNrVertices(grafo); i++) {
+        if(!visitados[i]) {
+            visitados[i] = 1;
+            nivel[i] = 0;
+            antecessor[i] = -1;
+            fila[fim++] = i;
 
-    visitaEmProfundidade(vertice, visitados, nivel, antecessor, fila, &inicio, &fim, grafo);
-    //verifica se chegou ao fim da busca e se ainda tem vertices para visitar
-    while(inicio == fim && (fim + 1) < obtemNrVertices(grafo)) {
-        //acha o vertice
-        for(int i = 0; i < obtemNrVertices(grafo); i++) {
-            if(!visitados[i]) {
-                visitados[i] = 1;
-                nivel[i] = 0;
-                antecessor[i] = -1;
-                fila[fim++] = i;
-                break;
-            }
+            visitaEmProfundidade(i, visitados, nivel, antecessor, fila, &fim, grafo);
         }
-        //se achou, começa uma nova busca
-        if(inicio != fim) visitaEmProfundidade(fila[inicio++], visitados, nivel, antecessor, fila, &inicio, &fim, grafo);
     }
 
     printf("BP:\n");
@@ -236,78 +236,51 @@ void buscaEmProfundidade(Grafo *grafo, int vertice) {
     }
 }
 
-void componentesConexos(Grafo *grafo, int vertice) {
+void componentesConexos(Grafo *grafo) {
     int visitados[obtemNrVertices(grafo)];
-    int fila[obtemNrVertices(grafo)];
+    int antecessor[obtemNrVertices(grafo)];
     int itensComponentes[obtemNrVertices(grafo)];
-    int inicio = 0, fim = 0, qComponentes = 0, indexComponente = 0;
+    int fim = 0, qComponentes = 0;
 
-    for (int i = 0; i < grafo->numVertices; i++) {
+    for (int i = 0; i < obtemNrVertices(grafo); i++) {
         visitados[i] = 0;
-        fila[i] = -1;
+        //fila[i] = -1;
         itensComponentes[i] = -1;
     }
 
     printf("Componentes conectados:\n");
 
-    //adicionar o primeiro componente
-    visitados[vertice] = 1; //cinza
-    fila[fim++] = vertice;
-    itensComponentes[indexComponente] = vertice;
-    qComponentes++;
+    for(int i = 0; i < obtemNrVertices(grafo); i++) {
+        //se o vertice não foi visitado, visitar
+        if(!visitados[i]) {
+            //atualizar quantos componentes existem e marca como visitado
+            visitados[i] = 1; //cinza
+            //fila[fim++] = vertice;
+            itensComponentes[fim++] = i;
+            qComponentes++;
+            visitaEmProfundidadeComponentesConexos(i, visitados, antecessor, itensComponentes, &fim, grafo);
 
-    while(inicio != fim) {
-        vertice = fila[inicio++];
-        int vAdj;
-        Apontador apontadorVAdj = primeiroListaAdj(vertice, grafo);
-        //vertice valido
-        if(!verificaApontador(apontadorVAdj, grafo)) vAdj = -1;
-        else vAdj = obtemValorVertice(apontadorVAdj, grafo);
-        
-        while(vAdj != -1) {
-            if(!visitados[vAdj]) {
-                visitados[vAdj] = 1;
-                fila[fim++] = vAdj;
-                itensComponentes[++indexComponente] = vAdj;
-            }
-            apontadorVAdj = proxListaAdj(vertice, grafo, apontadorVAdj);
-            if(!verificaApontador(apontadorVAdj, grafo)) vAdj = -1;
-            else vAdj = obtemValorVertice(apontadorVAdj, grafo);
-        }
+            //ordenar o array de itensComponentes
+            ordenarArray(itensComponentes, fim);
 
-        //visitou todos os adjacentes
-        visitados[vertice] = 2;
-
-        //procurar outro componente
-        if(inicio == fim) {
-            //função de ordenação antes de imprimir os resultados!!
-            ordenarArray(itensComponentes, indexComponente + 1);
             printf("C%d: ", qComponentes);
-            for(int i = 0; i <= indexComponente; i++) {
-                printf("%d ", itensComponentes[i]);
-            }
-            printf("\n");
 
-            for(int i  = 0; i < obtemNrVertices(grafo); i++) {
-                if(!visitados[i]) {
-                    //setar a lista de componentes
-                    for(int j = 0; j < obtemNrVertices(grafo); j++) {
-                        itensComponentes[j] = -1;
-                    }
-                    indexComponente = 0;
-                    visitados[i] = 1;
-                    fila[fim++] = i;
-                    itensComponentes[indexComponente] = i;
-                    qComponentes++;
-                    break;
-                }
+            //printar os itensComponentes
+            int j = 0;
+            while(itensComponentes[j] != -1) {
+                printf("%d ", itensComponentes[j]);
+                //setar os itensComponentes para -1
+                //evita um loop a mais
+                itensComponentes[j] = -1;
+                j++;
             }
+            fim = 0;
+            printf("\n");
         }
     }
-
 }
 
-void verticesDeArticulacao(Grafo *grafo);
+void verticesDeArticulacao(Grafo* grafo) {}
 
 int main (int argc, char* argsValues[]) {
     //validar argumentos
@@ -373,15 +346,19 @@ int main (int argc, char* argsValues[]) {
     //liberaGrafo(&grafo);
     //if(grafo.numVertices) printf("O grafo ainda existe\n");
     
-    buscaEmLargura(&grafo, 0);
+    buscaEmLargura(&grafo);
 
     printf("\n");
 
-    buscaEmProfundidade(&grafo, 0);
+    buscaEmProfundidade(&grafo);
 
     printf("\n");
     
-    componentesConexos(&grafo, 0);
+    componentesConexos(&grafo);
+
+    printf("\n");
+
+    verticesDeArticulacao(&grafo);
 
     //imprimeGrafo(&grafo);
 
