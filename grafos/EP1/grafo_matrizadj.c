@@ -100,13 +100,10 @@ Apontador proxListaAdj(int v, Grafo* grafo, Apontador atual) {
 int obtemVerticeDestino(Apontador p, Grafo* grafo) {
     if(!verificaValidadeVertice(p, grafo)) return -1;
     
-    for(int i = 0; i < grafo->numVertices; i++) {
-        if(existeAresta(p, i, grafo)) return i;
-    }
-
-    return -1;
+    return p;
 }
 
+//tá com erro
 void liberaGrafo(Grafo* grafo) {
     int n = grafo->numVertices;
     for (int i = 0; i < n; i++) {
@@ -115,7 +112,6 @@ void liberaGrafo(Grafo* grafo) {
     free(grafo);
 }
 
-//ta com problema
 void imprimeGrafo(Grafo *grafo) {
     for(int i = 0; i < grafo->numVertices; i++){
         int qVerticesAdj = 0;
@@ -131,10 +127,6 @@ void imprimeGrafo(Grafo *grafo) {
             printf("%d <-------> %s\n", i, "Nenhum vértice adjacente");
         }
     }
-}
-
-int obtemValorVertice(Apontador p, Grafo* grafo) {
-    return p;
 }
 
 bool verificaApontador(Apontador p, Grafo* grafo) {

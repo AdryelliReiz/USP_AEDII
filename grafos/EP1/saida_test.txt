@@ -1,0 +1,29 @@
+BL:
+0 2 1 3 5 4 6 
+
+Caminhos BL:
+0 
+0 1 
+0 2 
+0 2 3 
+0 2 3 4 
+0 2 3 5 
+0 2 3 5 6 
+
+BP:
+0 2 3 5 6 4 1 
+
+Caminhos BP:
+0 
+0 2 3 1 
+0 2 
+0 2 3 
+0 2 3 5 6 4 
+0 2 3 5 
+0 2 3 5 6 
+
+Componentes conectados:
+C1: 0 1 2 3 4 5 6 
+
+Vértices de articulação:
+3 

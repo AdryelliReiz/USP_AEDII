@@ -161,8 +161,7 @@ Apontador proxListaAdj(int v, Grafo* grafo, Apontador atual) {
 int obtemVerticeDestino(Apontador p, Grafo* grafo) {
     if(p == NULL) return -1;
     if(!verificaValidadeVertice(p->vdest, grafo)) return -1;
-    if(p->prox != NULL) return p->prox->vdest;
-    return -1;
+    return p->vdest;
 }
 //ta com erro
 void liberaGrafo(Grafo* grafo) {
@@ -189,10 +188,6 @@ void imprimeGrafo(Grafo *grafo) {
             }
         }
     }
-}
-
-int obtemValorVertice(Apontador p, Grafo* grafo) {
-    return p->vdest;
 }
 
 bool verificaApontador(Apontador p, Grafo* grafo) {
