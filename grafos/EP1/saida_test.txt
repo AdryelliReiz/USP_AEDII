@@ -22,8 +22,8 @@ Caminhos BP:
 0 2 3 5 
 0 2 3 5 6 
 
-Componentes conectados:
+Componentes Conectados:
 C1: 0 1 2 3 4 5 6 
 
-Vértices de articulação:
+Vertices de articulacao:
 3 

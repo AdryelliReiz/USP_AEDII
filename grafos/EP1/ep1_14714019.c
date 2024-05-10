@@ -66,7 +66,7 @@ void visitaEmProfundidade(int vertice, int visitados[], int nivel[], int anteces
     if(!verificaApontador(apontadorVerticeAdj, grafo)) verticeAdj = -1;
     else verticeAdj = obtemVerticeDestino(apontadorVerticeAdj, grafo);
 
-    // enquanto o vértice é válido, se não foi visitado-> visita, senão procura outro adjacente
+    //enquanto o vértice é válido, se não foi visitado-> visita, senão procura outro adjacente
     while(verticeAdj != -1) {
         if(!visitados[verticeAdj]) {
             visitados[verticeAdj] = 1;
@@ -88,7 +88,7 @@ void visitaEmProfundidadeComponentesConexos(int vertice, int visitados[], int an
     if(!verificaApontador(apontadorVerticeAdj, grafo)) verticeAdj = -1;
     else verticeAdj = obtemVerticeDestino(apontadorVerticeAdj, grafo);
     
-    // enquanto o vértice é válido, se não foi visitado-> visita, senão procura outro adjacente
+    //enquanto o vértice é válido, se não foi visitado-> visita, senão procura outro adjacente
     while(verticeAdj != -1) {
         if(!visitados[verticeAdj]) {
             visitados[verticeAdj] = 1;
@@ -282,7 +282,7 @@ void componentesConexos(Grafo *grafo, FILE *arquivoSaida) {
         itensComponentes[i] = -1;
     }
 
-    fprintf(arquivoSaida, "Componentes conectados:\n");
+    fprintf(arquivoSaida, "Componentes Conectados:\n");
 
     for(int i = 0; i < obtemNrVertices(grafo); i++) {
         //se o vertice não foi visitado, visitar
@@ -338,7 +338,7 @@ void verticesDeArticulacao(Grafo* grafo, FILE *arquivoSaida) {
         }
     }
 
-    fprintf(arquivoSaida, "Vértices de articulação:\n");
+    fprintf(arquivoSaida, "Vertices de articulacao:\n");
     for (int i = 0; i < grafo->numVertices; i++) {
         if (articulacao[i]) {
             fprintf(arquivoSaida, "%d ", i);
@@ -382,8 +382,7 @@ int main (int argc, char* argsValues[]) {
 
     verticesDeArticulacao(&grafo, arquivoSaida);
     
-    //função libera grafo está com problema
-    //liberaGrafo(&grafo);
+    liberaGrafo(&grafo);
 
     return 0;
 }

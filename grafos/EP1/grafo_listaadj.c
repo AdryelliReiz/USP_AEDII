@@ -173,7 +173,6 @@ void liberaGrafo(Grafo* grafo) {
             atual = proximo;
         }
     }
-    free(grafo);
 }
 
 void imprimeGrafo(Grafo *grafo) {

@@ -104,13 +104,7 @@ int obtemVerticeDestino(Apontador p, Grafo* grafo) {
 }
 
 //tá com erro
-void liberaGrafo(Grafo* grafo) {
-    int n = grafo->numVertices;
-    for (int i = 0; i < n; i++) {
-        free(grafo->mat[i]);
-    }
-    free(grafo);
-}
+void liberaGrafo(Grafo* grafo) {}
 
 void imprimeGrafo(Grafo *grafo) {
     for(int i = 0; i < grafo->numVertices; i++){
