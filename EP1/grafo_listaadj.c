@@ -163,7 +163,7 @@ int obtemVerticeDestino(Apontador p, Grafo* grafo) {
     if(!verificaValidadeVertice(p->vdest, grafo)) return -1;
     return p->vdest;
 }
-//ta com erro
+
 void liberaGrafo(Grafo* grafo) {
     for (int i = 0; i < grafo->numVertices; i++) {
         Apontador atual = grafo->listaAdj[i];

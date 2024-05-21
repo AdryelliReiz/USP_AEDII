@@ -103,7 +103,6 @@ int obtemVerticeDestino(Apontador p, Grafo* grafo) {
     return p;
 }
 
-//tá com erro
 void liberaGrafo(Grafo* grafo) {}
 
 void imprimeGrafo(Grafo *grafo) {
