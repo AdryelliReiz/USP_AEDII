@@ -43,6 +43,7 @@ void visitaEmLargura(int vertice, int visitados[], int nivel[], int antecessor[]
             nivel[verticeAdj] = nivel[vertice] + 1;
             antecessor[verticeAdj] = vertice;
             fila[++(*fim)] = verticeAdj;
+            printf("ADICIONA %d NA FILA!\n", verticeAdj);
         }
 
         //atualiza o vertice a ser verificado
@@ -381,6 +382,8 @@ int main (int argc, char* argsValues[]) {
     componentesConexos(&grafo, arquivoSaida);
 
     verticesDeArticulacao(&grafo, arquivoSaida);
+
+    imprimeGrafo(&grafo);
     
     liberaGrafo(&grafo);
 

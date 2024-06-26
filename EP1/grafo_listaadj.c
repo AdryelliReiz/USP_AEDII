@@ -45,37 +45,20 @@ void insereAresta(int v1, int v2, Peso peso, Grafo *grafo) {
     if(!verificaValidadeVertice(v2, grafo)) return;
 
     if(!existeAresta(v1, v2, grafo)) {
-        //cria nova aresta para v2 e inserir no final de v1
+        //cria nova aresta para v2 e inserir no inicio de v1
         Apontador novaArestaV1 = (Apontador) malloc(sizeof(Aresta));
         novaArestaV1->vdest = v2;
         novaArestaV1->peso = peso;
-        novaArestaV1->prox = NULL;
+        novaArestaV1->prox = grafo->listaAdj[v1];
+        grafo->listaAdj[v1] = novaArestaV1;
 
-        if (grafo->listaAdj[v1] == NULL) {
-            grafo->listaAdj[v1] = novaArestaV1;
-        } else {
-            Apontador p = grafo->listaAdj[v1];
-            while (p->prox != NULL) {
-                p = p->prox;
-            }
-            p->prox = novaArestaV1;
-        }
-
-        //cria nova aresta para v1 e inserir no final de v2
+        //cria nova aresta para v1 e inserir no inicio de v2
         Apontador novaArestaV2 = (Apontador) malloc(sizeof(Aresta));
         novaArestaV2->vdest = v1;
         novaArestaV2->peso = peso;
-        novaArestaV2->prox = NULL;
+        novaArestaV2->prox = grafo->listaAdj[v2];
+        grafo->listaAdj[v2] = novaArestaV2;
 
-        if (grafo->listaAdj[v2] == NULL) {
-            grafo->listaAdj[v2] = novaArestaV2;
-        } else {
-            Apontador p = grafo->listaAdj[v2];
-            while (p->prox != NULL) {
-                p = p->prox;
-            }
-            p->prox = novaArestaV2;
-        }
         grafo->numArestas++;
     }
 }
